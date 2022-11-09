@@ -11,11 +11,11 @@ $ go get -v github.com/cyradin/ngrams
 ## Usage
 
 ```go
-	result := ngrams.From("orange", 3)
-	fmt.Println(result) // [ora, ran, ang, nge]
+    result := ngrams.From("orange", 3)
+    fmt.Println(result) // [ora, ran, ang, nge]
 
     result := ngrams.FromRange("word", 2, 3)
-	fmt.Println(result) // [wo, or, rd, wor, ord]
+    fmt.Println(result) // [wo, or, rd, wor, ord]
 ```
 
 
