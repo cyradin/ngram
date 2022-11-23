@@ -5,7 +5,7 @@ N-grams generation library written in go
 ## Install
 
 ```bash
-$ go get -v github.com/cyradin/ngrams
+$ go get -v github.com/f1monkey/ngrams
 ```
 
 ## Usage
