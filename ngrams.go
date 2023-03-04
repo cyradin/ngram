@@ -2,13 +2,12 @@ package ngrams
 
 import (
 	"fmt"
-	"strings"
 )
 
 var ErrParam = fmt.Errorf("invalid value of")
 
 // MakeRange generates ngrams with len=min..max
-func MakeRange(word string, min, max int) ([]string, error) {
+func MakeRange(word string, min, max int) ([][]rune, error) {
 	if min < 1 {
 		return nil, fmt.Errorf("%w min: cannot be < 1", ErrParam)
 	}
@@ -23,12 +22,11 @@ func MakeRange(word string, min, max int) ([]string, error) {
 		return nil, nil
 	}
 
-	runes := []rune(word)
-	wordLen := len(runes)
+	wordLen := len([]rune(word))
 	maxN := minOf(wordLen, max)
-	result := make([]string, 0, ngramCnt(len(runes), min, maxN))
+	result := make([][]rune, 0, ngramCnt(wordLen, min, maxN))
 	for n := min; n <= maxN; n++ {
-		items, err := FromRunes(runes, n)
+		items, err := From(word, n)
 		if err != nil {
 			return nil, err
 		}
@@ -39,12 +37,12 @@ func MakeRange(word string, min, max int) ([]string, error) {
 }
 
 // From generates ngrams from a string with len=n
-func From(word string, n int) ([]string, error) {
+func From(word string, n int) ([][]rune, error) {
 	return FromRunes([]rune(word), n)
 }
 
 // FromRunes generates ngrams from a rune slice with len=n
-func FromRunes(runes []rune, n int) ([]string, error) {
+func FromRunes(runes []rune, n int) ([][]rune, error) {
 	if n < 1 {
 		return nil, fmt.Errorf("%w: n cannot be < 1", ErrParam)
 	}
@@ -54,11 +52,11 @@ func FromRunes(runes []rune, n int) ([]string, error) {
 	}
 
 	if n == len(runes) {
-		return []string{string(runes)}, nil
+		return [][]rune{runes}, nil
 	}
 
 	cnt := ngramCnt(len(runes), n, n)
-	builders := make([]strings.Builder, cnt)
+	buf := make([]rune, n*cnt)
 
 	for i, r := range runes {
 		for j := i - n + 1; j <= i; j++ {
@@ -69,13 +67,15 @@ func FromRunes(runes []rune, n int) ([]string, error) {
 				break
 			}
 
-			builders[j].WriteRune(r)
+			index := j*n + (i - j)
+
+			buf[index] = r
 		}
 	}
 
-	result := make([]string, cnt)
-	for i, b := range builders {
-		result[i] = b.String()
+	result := make([][]rune, cnt)
+	for i := 0; i < cnt; i++ {
+		result[i] = buf[i*n : (i+1)*n]
 	}
 
 	return result, nil
